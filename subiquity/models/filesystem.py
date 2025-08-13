@@ -1151,6 +1151,7 @@ class LVM_VolGroup(_Device):
         backlink="_constructed_device"
     )
 
+    ptable: Optional[str] = None
     preserve: bool = False
 
     @property
@@ -1189,6 +1190,9 @@ class LVM_LogicalVolume(_Formattable):
     preserve: bool = False
     path: Optional[str] = None
 
+    def _path(self):
+        return self.path
+
     def serialize_size(self):
         if self.size is None:
             return {}
@@ -1206,8 +1210,11 @@ class LVM_LogicalVolume(_Formattable):
     def flag(self):
         return None  # hack!
 
+    boot = False
+    estimated_min_size = -1
     ok_for_raid = False
     ok_for_lvm_vg = False
+    os: Optional[OsProber] = None
 
     def on_remote_storage(self) -> bool:
         return self.volgroup.on_remote_storage()

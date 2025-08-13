@@ -318,6 +318,7 @@ def for_client(device, *, min_size=0):
 
 @for_client.register(Disk)
 @for_client.register(Raid)
+@for_client.register(LVM_VolGroup)
 def _for_client_disk(disk, *, min_size=0):
     return types.Disk(
         id=disk.id,
@@ -334,7 +335,7 @@ def _for_client_disk(disk, *, min_size=0):
         ok_for_guided=disk.size >= min_size and not disk.on_remote_storage(),
         model=getattr(disk, "model", None),
         vendor=getattr(disk, "vendor", None),
-        has_in_use_partition=disk._has_in_use_partition,
+        has_in_use_partition=getattr(disk, "_has_in_use_partition", False),
         requires_reformat=disk.ptable == "unsupported",
     )
 
@@ -368,21 +369,22 @@ def _resolve_constructed_object(partition: Partition) -> tuple[str, str, bool]:
 
 
 @for_client.register(Partition)
+@for_client.register(LVM_LogicalVolume)
 def _for_client_partition(partition, *, min_size=0):
     e_mount, e_format, e_encrypted = _resolve_constructed_object(partition)
     return types.Partition(
         size=partition.size,
-        number=partition.number,
+        number=getattr(partition, "number", None),
         wipe=partition.wipe,
         preserve=partition.preserve,
-        grub_device=partition.grub_device,
+        grub_device=getattr(partition, "grub_device", False),
         boot=partition.boot,
         annotations=annotations(partition) + usage_labels(partition),
         os=partition.os,
-        offset=partition.offset,
-        resize=partition.resize,
+        offset=getattr(partition, "offset", None),
+        resize=getattr(partition, "resize", None),
         path=partition._path(),
-        name=partition.partition_name,
+        name=getattr(partition, "partition_name", None),
         estimated_min_size=partition.estimated_min_size,
         mount=partition.mount,
         format=partition.format,

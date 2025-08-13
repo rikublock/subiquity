@@ -1180,6 +1180,7 @@ class FilesystemController(SubiquityController, FilesystemManipulator):
             disks = self.potential_boot_disks(with_reformatting=True)
         else:
             disks = model._all(type="disk")
+            disks.extend(model._all(type="lvm_volgroup"))
         minsize = self.calculate_suggested_install_min()
         return StorageResponseV2(
             status=ProbeStatus.DONE,

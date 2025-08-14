@@ -1186,7 +1186,8 @@ class LVM_LogicalVolume(_Formattable):
     volgroup: LVM_VolGroup = attributes.ref(backlink="_partitions")
     size: int = attributes.size(default=None)
     wipe: Optional[str] = None
-
+    
+    number: Optional[int] = None
     preserve: bool = False
     path: Optional[str] = None
 
@@ -1722,6 +1723,11 @@ class FilesystemModel:
             if disk._fs.fstype == p1._fs.fstype == "iso9660":
                 if p1._is_in_use and not disk._is_in_use:
                     self.remove_filesystem(disk._fs)
+
+        # Hack to give LVM partitions a number
+        for vg in self._all(type="lvm_volgroup"):
+            for i, p in enumerate(vg._partitions):
+                p.number = i + 1
 
         for o in self._actions:
             if o.type == "partition" and o.flag == "swap":

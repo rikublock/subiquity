@@ -374,7 +374,7 @@ def _for_client_partition(partition, *, min_size=0):
     e_mount, e_format, e_encrypted = _resolve_constructed_object(partition)
     return types.Partition(
         size=partition.size,
-        number=getattr(partition, "number", None),
+        number=partition.number,
         wipe=partition.wipe,
         preserve=partition.preserve,
         grub_device=getattr(partition, "grub_device", False),

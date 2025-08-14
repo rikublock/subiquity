@@ -1190,6 +1190,7 @@ class LVM_LogicalVolume(_Formattable):
     number: Optional[int] = None
     preserve: bool = False
     path: Optional[str] = None
+    partition_name: Optional[str] = None
 
     def _path(self):
         return self.path
